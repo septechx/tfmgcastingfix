@@ -19,20 +19,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(CastingBasinBlockEntity.class)
 public abstract class CastingBasinBlockEntityMixin {
-    @Shadow public FluidTank tank;
-    @Shadow public LazyOptional<IFluidHandler> fluidCapability;
-    @Shadow public CastingRecipe recipe;
+    @Shadow(remap = false) public FluidTank tank;
+    @Shadow(remap = false) public LazyOptional<IFluidHandler> fluidCapability;
+    @Shadow(remap = false) public CastingRecipe recipe;
 
-    @Shadow protected abstract void onFluidChanged(FluidStack stack);
+    @Shadow(remap = false) protected abstract void onFluidChanged(FluidStack stack);
 
     @Inject(method = "<init>(Lnet/minecraft/world/level/block/entity/BlockEntityType;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V",
+            remap = false,
             at = @At("RETURN"))
     private void onConstructed(BlockEntityType<?> type, BlockPos pos, BlockState state, CallbackInfo ci) {
         this.tank = new SmartFluidTank(1000, this::onFluidChanged);
         this.fluidCapability = LazyOptional.of(() -> this.tank);
     }
 
-    @Redirect(method = "tick", at = @At(value = "INVOKE",
+    @Redirect(method = "tick", remap = false, at = @At(value = "INVOKE",
             target = "Lnet/minecraftforge/fluids/capability/templates/FluidTank;getSpace()I"))
     private int redirectGetSpace(FluidTank targetTank) {
         if (this.recipe == null)
@@ -47,7 +48,7 @@ public abstract class CastingBasinBlockEntityMixin {
         return targetTank.getSpace();
     }
 
-    @Redirect(method = "tick", at = @At(value = "INVOKE",
+    @Redirect(method = "tick", remap = false, at = @At(value = "INVOKE",
             target = "Lnet/minecraftforge/fluids/capability/templates/FluidTank;setFluid(Lnet/minecraftforge/fluids/FluidStack;)V"))
     private void redirectSetFluid(FluidTank targetTank, FluidStack stack) {
         // if the original code attempts to set EMPTY after recipe completion, drain only required amount
