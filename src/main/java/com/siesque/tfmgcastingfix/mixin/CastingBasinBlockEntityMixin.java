@@ -37,7 +37,7 @@ public abstract class CastingBasinBlockEntityMixin {
             target = "Lnet/minecraftforge/fluids/capability/templates/FluidTank;getSpace()I"))
     private int redirectGetSpace(FluidTank targetTank) {
         if (this.recipe == null)
-            return targetTank.getSpace();
+            return 0;
 
         int required = this.recipe.getIngrenient().getRequiredAmount();
         if (required > 0 && targetTank.getFluidAmount() >= required) {
