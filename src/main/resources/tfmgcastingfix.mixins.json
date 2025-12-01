@@ -8,7 +8,6 @@
     "CastingBasinBlockEntityMixin"
   ],
   "client": [
-    "CastingBasinRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

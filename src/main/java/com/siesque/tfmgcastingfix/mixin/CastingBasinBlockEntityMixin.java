@@ -3,6 +3,7 @@ package com.siesque.tfmgcastingfix.mixin;
 import com.drmangotea.tfmg.content.machinery.metallurgy.casting_basin.CastingBasinBlockEntity;
 import com.drmangotea.tfmg.recipes.CastingRecipe;
 import com.simibubi.create.foundation.fluid.SmartFluidTank;
+import net.createmod.catnip.animation.LerpedFloat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -67,5 +68,18 @@ public abstract class CastingBasinBlockEntityMixin {
 
         // non-empty set, keep original behavior
         targetTank.setFluid(stack);
+    }
+
+    @Redirect(method = "tick", remap = false, at = @At(value = "INVOKE",
+            target = "Lnet/createmod/catnip/animation/LerpedFloat;chase(DDLnet/createmod/catnip/animation/LerpedFloat$Chaser;)Lnet/createmod/catnip/animation/LerpedFloat;"))
+    private LerpedFloat redirectChase(LerpedFloat instance, double value, double speed, LerpedFloat.Chaser chaser) {
+        if (this.recipe == null) {
+            return instance;
+        } else {
+            int required = this.recipe.getIngrenient().getRequiredAmount();
+            instance.chase(Math.min(required - 1, value), speed, chaser);
+        }
+
+        return instance;
     }
 }
